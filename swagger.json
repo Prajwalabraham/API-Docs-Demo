@@ -1,0 +1,414 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "REST API for Swagger Documentation",
+      "version": "1.0.0"
+    },
+    "schemes": ["http"],
+    "servers": [{ "url": "http://localhost:4000/api/v3/app" }],
+    "paths": {
+      "/events/:id": {
+        "get": {
+          "tags": ["Get event data by ID"],
+          "summary": "Gets the event data by ID",
+          "description": "Get event data by the specified event ID. The parameters are sent via the query",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "query",
+              "description": "Event ID",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Event not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/events/:type&:limit&:page": {
+        "get": {
+          "tags": ["Get latest events"],
+          "summary": "Gets latest events using params",
+          "description": "Get the latest events based on the provided parameters. Ex: Gets an event by its recency & paginate results by page number and limit of events per page",
+          "parameters": [
+            {
+              "name": "type",
+              "in": "query",
+              "description": "Event type",
+              "required": false,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "description": "Number of events to retrieve",
+              "required": false,
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "name": "page",
+              "in": "query",
+              "description": "Page number",
+              "required": false,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Event"
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Events not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/events": {
+        "post": {
+          "tags": ["Post Method to create"],
+          "summary": "Create a new event",
+          "description": "Creates an event and returns the Id of the event i.e. created",
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewEventRequestBody"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Successfully Created",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                }
+              }
+            }, 
+            "409": {
+              "description": "Event already exists!!",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/events/{id}": {
+        "put": {
+          "tags": ["Put method"],
+          "summary": "Update event data by ID",
+          "description": "Update event data for the specified event ID.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Event ID",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateEventRequestBody"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Event not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/events/delete/{id}": {
+        "delete": {
+          "tags": ["Delete Request"],
+          "summary": "Delete event by ID",
+          "description": "Delete the event with the specified ID.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "Event ID",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Event"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Event not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "UpdateEventRequestBody": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "image": {
+              "type": "string"
+            },
+            "tagline": {
+              "type": "string"
+            },
+            "schedule": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": {
+              "type": "string"
+            },
+            "moderator": {
+              "type": "string"
+            },
+            "category": {
+              "type": "string"
+            },
+            "sub_category": {
+              "type": "string"
+            },
+            "rigor_rank": {
+              "type": "number"
+            },
+            "attendees": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "NewEventRequestBody": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "Prajwal"
+            },
+            "image": {
+              "type": "string",
+              "example": "latest"
+            },
+            "tagline": {
+              "type": "string",
+              "example": "Good!!!"
+            },
+            "schedule": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2023-06-22"
+            },
+            "description": {
+              "type": "string",
+              "example": "This is the best documentation"
+            },
+            "moderator": {
+              "type": "string",
+              "example": "Prajwal"
+            },
+            "category": {
+              "type": "string",
+              "example": "Programming"
+            },
+            "sub_category": {
+              "type": "string",
+              "example": "JS/TS"
+            },
+            "rigor_rank": {
+              "type": "number",
+              "example": 21
+            }
+          },
+          "required": [
+            "name",
+            "image",
+            "tagline",
+            "schedule",
+            "description",
+            "moderator",
+            "category",
+            "sub_category",
+            "rigor_rank"
+          ]
+        },
+        "Event": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "example": "event"
+            },
+            "uid": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "tagline": {
+              "type": "string"
+            },
+            "schedule": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": {
+              "type": "string"
+            },
+            "files": {
+              "type": "object",
+              "properties": {
+                "image": {
+                  "type": "string"
+                }
+              }
+            },
+            "moderator": {
+              "type": "string"
+            },
+            "category": {
+              "type": "string"
+            },
+            "sub_category": {
+              "type": "string"
+            },
+            "rigor_rank": {
+              "type": "number"
+            },
+            "attendees": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }    

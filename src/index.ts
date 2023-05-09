@@ -1,26 +1,42 @@
-// index.ts
 import express from 'express';
+import dotenv from 'dotenv';
+import cors from "cors";
+import swaggerUI from 'swagger-ui-express';
 import bodyParser from 'body-parser';
-import cors from 'cors';
-import FoodRouter from './routes/Food';
-import EventRouter from './routes/Event';
-import VolunteerRouter from './routes/Volunteer';
-
+import * as swaggerDocument from "../swagger.json";
+import Router from './API/Controllers/EventController';
 const app = express();
+
+
+dotenv.config();
+//options for cors midddleware
+const options: cors.CorsOptions = {
+      allowedHeaders: [
+        'Origin',
+        'X-Requested-With',
+        'Content-Type',
+        'Accept',
+        'X-Access-Token',
+      ],
+      credentials: true,
+      methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+      origin: process.env.API_URL,
+      preflightContinue: false,
+    };
+
+//use cors middleware
+app.use(cors(options));
 
 // Set up middleware
 app.use(bodyParser.json());
-app.use(cors());
-
-// Use the routes
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use('/food', FoodRouter);
-app.use('/event', EventRouter);
-app.use('/volunteer', VolunteerRouter);
 
-// Start the server
-app.listen(4000, () => {
-  console.log('Server is running on port 4000');
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
+app.use('/api/v3/app', Router)
+
+app.listen(process.env.BACK_PORT, () => {
+      console.log(`server running : http://${process.env.BACK_HOST}:${process.env.BACK_PORT}`);   
 });
